@@ -1,0 +1,2087 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Naviapark – Intelligent Parkering</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --midnight: #0A192F;
+  --midnight-deep: #060F1E;
+  --slate: #112240;
+  --slate-light: #1E3A5F;
+  --ice: #F0F4F8;
+  --ice-blue: #E8EEF4;
+  --white: #FFFFFF;
+  --gold: #E8A020;
+  --gold-light: #F5B942;
+  --gold-glow: rgba(232,160,32,0.18);
+  --tech-blue: #4DA8DA;
+  --text-primary: #CCD6F6;
+  --text-muted: #8892B0;
+  --text-dark: #1A2744;
+  --radius: 16px;
+  --transition: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--midnight-deep);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* ─── NAV ─────────────────────────────────────────── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 60px;
+  background: rgba(6,15,30,0.72);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(77,168,218,0.08);
+  transition: all 0.4s var(--transition);
+}
+.nav-logo {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--white);
+  letter-spacing: -0.5px;
+}
+.nav-logo span { color: var(--gold); }
+.nav-links { display: flex; gap: 36px; list-style: none; }
+.nav-links a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 400;
+  letter-spacing: 0.3px;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--white); }
+.nav-cta {
+  background: var(--gold);
+  color: var(--midnight-deep);
+  border: none;
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s var(--transition);
+  letter-spacing: 0.2px;
+}
+.nav-cta:hover {
+  background: var(--gold-light);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(232,160,32,0.35);
+}
+
+/* ─── HERO ─────────────────────────────────────────── */
+#hero {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  padding: 120px 60px 80px;
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(ellipse 80% 60% at 70% 50%, rgba(17,34,64,0.95) 0%, var(--midnight-deep) 70%);
+}
+.hero-bg-grid {
+  position: absolute; inset: 0; z-index: 0;
+  background-image:
+    linear-gradient(rgba(77,168,218,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(77,168,218,0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 0%, transparent 75%);
+}
+.hero-noise {
+  position: absolute; inset: 0; z-index: 0; opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+.hero-content { position: relative; z-index: 2; }
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(232,160,32,0.12);
+  border: 1px solid rgba(232,160,32,0.3);
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--gold);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin-bottom: 28px;
+  animation: fadeSlideUp 0.8s var(--transition) both;
+}
+.hero-badge::before {
+  content: '';
+  width: 6px; height: 6px;
+  background: var(--gold);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+
+h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(2.2rem, 8vw, 4.2rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: clamp(-0.5px, -0.03em, -1.5px);
+  color: var(--white);
+  margin-bottom: 24px;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  animation: fadeSlideUp 0.9s 0.1s var(--transition) both;
+}
+h1 em {
+  font-style: normal;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-sub {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  max-width: 480px;
+  line-height: 1.7;
+  margin-bottom: 44px;
+  font-weight: 300;
+  animation: fadeSlideUp 1s 0.2s var(--transition) both;
+}
+.hero-ctas {
+  display: flex; gap: 16px; flex-wrap: wrap;
+  animation: fadeSlideUp 1s 0.3s var(--transition) both;
+}
+.btn-primary {
+  background: var(--gold);
+  color: var(--midnight-deep);
+  border: none;
+  padding: 15px 32px;
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s var(--transition);
+  letter-spacing: 0.1px;
+  text-decoration: none;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-primary:hover {
+  background: var(--gold-light);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(232,160,32,0.4);
+}
+.btn-secondary {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid rgba(204,214,246,0.2);
+  padding: 15px 32px;
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.3s var(--transition);
+  text-decoration: none;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-secondary:hover {
+  border-color: rgba(204,214,246,0.5);
+  color: var(--white);
+  background: rgba(255,255,255,0.05);
+}
+.hero-stats {
+  display: flex; gap: 40px; margin-top: 56px;
+  animation: fadeSlideUp 1s 0.45s var(--transition) both;
+}
+.stat { display: flex; flex-direction: column; gap: 4px; }
+.stat-num {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: var(--white);
+  letter-spacing: -1px;
+}
+.stat-num span { color: var(--gold); }
+.stat-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 300; }
+.stat-divider { width: 1px; background: rgba(204,214,246,0.12); }
+
+/* 3D Hero Scene */
+.hero-visual {
+  position: relative; z-index: 2;
+  display: flex; align-items: center; justify-content: center;
+  animation: fadeSlideUp 1.1s 0.15s var(--transition) both;
+}
+.hero-3d-scene {
+  position: relative;
+  width: 520px; height: 520px;
+}
+.scene-glow {
+  position: absolute;
+  width: 380px; height: 380px;
+  background: radial-gradient(circle, rgba(232,160,32,0.15) 0%, rgba(77,168,218,0.08) 50%, transparent 70%);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  animation: scenePulse 4s ease-in-out infinite;
+}
+@keyframes scenePulse { 0%,100%{opacity:0.7;transform:translate(-50%,-50%) scale(1);} 50%{opacity:1;transform:translate(-50%,-50%) scale(1.08);} }
+
+/* Central parking structure */
+.parking-structure {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 240px; height: 200px;
+}
+.parking-svg { width: 100%; height: 100%; filter: drop-shadow(0 20px 60px rgba(77,168,218,0.3)); }
+
+/* Floating cards */
+.float-card {
+  position: absolute;
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 14px;
+  padding: 14px 18px;
+  display: flex; align-items: center; gap: 12px;
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+.float-card-icon {
+  width: 36px; height: 36px;
+  background: var(--gold-glow);
+  border: 1px solid rgba(232,160,32,0.3);
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+.float-card-text strong { display: block; font-weight: 600; color: var(--white); font-size: 0.85rem; }
+.float-card-text span { color: var(--text-muted); font-size: 0.75rem; }
+.fc1 { top: 8%; left: -4%; animation: float1 6s ease-in-out infinite; }
+.fc2 { top: 20%; right: -6%; animation: float2 7s ease-in-out infinite; }
+.fc3 { bottom: 14%; left: -8%; animation: float1 8s 1s ease-in-out infinite; }
+.fc4 { bottom: 8%; right: -2%; animation: float2 5.5s 0.5s ease-in-out infinite; }
+@keyframes float1 { 0%,100%{transform:translateY(0px) rotate(-1deg);} 50%{transform:translateY(-14px) rotate(1deg);} }
+@keyframes float2 { 0%,100%{transform:translateY(0px) rotate(1deg);} 50%{transform:translateY(-10px) rotate(-1deg);} }
+
+/* ─── SECTION COMMONS ─────────────────────────────── */
+section { position: relative; }
+.section-label {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 0.75rem; font-weight: 600;
+  color: var(--gold);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.section-label::before {
+  content: '';
+  display: block;
+  width: 24px; height: 1.5px;
+  background: var(--gold);
+}
+.section-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(1.75rem, 5vw, 3rem);
+  font-weight: 800;
+  color: var(--white);
+  letter-spacing: clamp(-0.3px, -0.02em, -1.5px);
+  line-height: 1.12;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+.section-sub {
+  font-size: 1.05rem;
+  color: var(--text-muted);
+  font-weight: 300;
+  line-height: 1.7;
+  max-width: 560px;
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── SECTION 2: THREE PILLARS ─────────────────────── */
+#pillars {
+  padding: 120px 60px;
+  background: var(--midnight-deep);
+}
+.pillars-header {
+  text-align: center;
+  margin-bottom: 70px;
+}
+.pillars-header .section-label { justify-content: center; }
+.pillars-header .section-label::before { display: none; }
+.pillars-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.pillar-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(77,168,218,0.1);
+  border-radius: var(--radius);
+  padding: 44px 36px;
+  transition: all 0.4s var(--transition);
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+}
+.pillar-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(232,160,32,0.05) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.pillar-card:hover {
+  border-color: rgba(232,160,32,0.25);
+  transform: translateY(-8px);
+  box-shadow: 0 32px 80px rgba(0,0,0,0.4), 0 0 0 1px rgba(232,160,32,0.1);
+  background: rgba(255,255,255,0.05);
+}
+.pillar-card:hover::before { opacity: 1; }
+.pillar-icon-wrap {
+  width: 80px; height: 80px;
+  margin-bottom: 28px;
+  position: relative;
+  transition: transform 0.4s var(--transition);
+}
+.pillar-card:hover .pillar-icon-wrap { transform: translateY(-6px) scale(1.05); }
+.pillar-icon-bg {
+  position: absolute; inset: 0;
+  background: rgba(232,160,32,0.1);
+  border-radius: 20px;
+  border: 1px solid rgba(232,160,32,0.2);
+}
+.pillar-icon-inner {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem;
+}
+.pillar-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--white);
+  letter-spacing: -0.5px;
+  margin-bottom: 14px;
+  line-height: 1.25;
+}
+.pillar-text {
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  line-height: 1.75;
+  font-weight: 300;
+}
+.pillar-tag-list {
+  margin-top: 24px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.pillar-tag {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 0.82rem;
+  color: var(--text-primary);
+}
+.pillar-tag::before {
+  content: '';
+  width: 18px; height: 18px;
+  background: rgba(232,160,32,0.15);
+  border: 1px solid rgba(232,160,32,0.35);
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='8' viewBox='0 0 10 8' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 4l2.5 2.5L9 1' stroke='%23E8A020' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* ─── SECTION 3: VALUE PROP ──────────────────────── */
+#value {
+  padding: 120px 60px;
+  background: linear-gradient(180deg, var(--midnight-deep) 0%, var(--midnight) 100%);
+}
+.value-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 100px;
+  align-items: start;
+}
+.value-sticky {
+  position: sticky;
+  top: 110px;
+}
+.value-sticky .section-title { margin-bottom: 20px; }
+.value-sticky .section-sub { margin-bottom: 36px; }
+.value-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(232,160,32,0.1);
+  border: 1px solid rgba(232,160,32,0.25);
+  border-radius: 100px;
+  padding: 6px 14px;
+  font-size: 0.78rem;
+  color: var(--gold);
+  font-weight: 500;
+  margin-bottom: 28px;
+  letter-spacing: 0.3px;
+}
+.value-avatar {
+  display: flex; align-items: center; gap: 12px;
+  padding: 16px 20px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  margin-top: 36px;
+}
+.avatar-img {
+  width: 44px; height: 44px;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--tech-blue) 100%);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--midnight-deep);
+  flex-shrink: 0;
+}
+.avatar-text strong { display: block; color: var(--white); font-size: 0.875rem; font-weight: 600; }
+.avatar-text span { color: var(--text-muted); font-size: 0.78rem; }
+.value-list { display: flex; flex-direction: column; gap: 32px; }
+.value-item {
+  padding: 32px 36px;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(77,168,218,0.08);
+  border-radius: 14px;
+  transition: all 0.35s var(--transition);
+  position: relative;
+}
+.value-item:hover {
+  background: rgba(255,255,255,0.04);
+  border-color: rgba(232,160,32,0.2);
+  transform: translateX(6px);
+}
+.value-item-num {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--gold);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.value-item-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--white);
+  letter-spacing: -0.3px;
+  margin-bottom: 10px;
+}
+.value-item-text {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.75;
+  font-weight: 300;
+}
+.value-item-accent {
+  position: absolute;
+  left: 0; top: 20px; bottom: 20px;
+  width: 3px;
+  background: var(--gold);
+  border-radius: 2px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.value-item:hover .value-item-accent { opacity: 1; }
+
+/* ─── SECTION 4: HOW IT WORKS ─────────────────────── */
+#how {
+  padding: 120px 60px;
+  background: var(--midnight-deep);
+  overflow: hidden;
+}
+.how-header {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto 80px;
+}
+.how-header .section-label { justify-content: center; }
+.how-header .section-label::before { display: none; }
+.timeline {
+  max-width: 1100px;
+  margin: 0 auto;
+  position: relative;
+}
+.timeline-line {
+  position: absolute;
+  top: 40px; left: 0; right: 0; height: 2px;
+  background: rgba(77,168,218,0.1);
+}
+.timeline-progress {
+  position: absolute;
+  top: 0; left: 0; width: 0; height: 100%;
+  background: linear-gradient(90deg, var(--gold) 0%, var(--gold-light) 100%);
+  transition: width 1.2s var(--transition);
+  border-radius: 2px;
+}
+.timeline-steps {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+  position: relative;
+}
+.timeline-step { text-align: center; padding-top: 0; }
+.step-dot-wrap {
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 28px;
+  position: relative;
+}
+.step-dot {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: var(--midnight);
+  border: 2px solid rgba(77,168,218,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem;
+  transition: all 0.4s var(--transition);
+  position: relative;
+  z-index: 2;
+}
+.step-dot.active {
+  background: linear-gradient(135deg, rgba(232,160,32,0.2) 0%, rgba(77,168,218,0.15) 100%);
+  border-color: var(--gold);
+  box-shadow: 0 0 30px rgba(232,160,32,0.3);
+}
+.step-num {
+  position: absolute;
+  top: -8px; right: -8px;
+  width: 22px; height: 22px;
+  background: var(--gold);
+  color: var(--midnight-deep);
+  border-radius: 50%;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+}
+.step-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 10px;
+  letter-spacing: -0.2px;
+  line-height: 1.25;
+}
+.step-text {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.65;
+  font-weight: 300;
+}
+
+/* ─── LOGOS / SOCIAL PROOF ────────────────────────── */
+#proof {
+  padding: 60px 60px;
+  border-top: 1px solid rgba(77,168,218,0.06);
+  border-bottom: 1px solid rgba(77,168,218,0.06);
+}
+.proof-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 60px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.proof-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.proof-logos {
+  display: flex; align-items: center; gap: 48px; flex-wrap: wrap;
+}
+.proof-logo {
+  font-family: 'Syne', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: rgba(204,214,246,0.25);
+  letter-spacing: -0.3px;
+  transition: color 0.3s;
+}
+.proof-logo:hover { color: rgba(204,214,246,0.55); }
+
+/* ─── FOOTER CTA ──────────────────────────────────── */
+#footer {
+  background: linear-gradient(180deg, var(--midnight-deep) 0%, #040C18 100%);
+  padding: 0;
+}
+.footer-cta {
+  padding: 120px 60px;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+.footer-cta-text .section-title { margin-bottom: 20px; }
+.footer-cta-text .section-sub { margin-bottom: 36px; }
+.footer-trust {
+  display: flex; flex-direction: column; gap: 16px;
+  margin-top: 40px;
+}
+.trust-item {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+.trust-icon {
+  width: 28px; height: 28px;
+  background: rgba(232,160,32,0.12);
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+.contact-form {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(77,168,218,0.12);
+  border-radius: 20px;
+  padding: 44px;
+}
+.form-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--white);
+  letter-spacing: -0.5px;
+  margin-bottom: 6px;
+}
+.form-sub {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-bottom: 32px;
+  font-weight: 300;
+}
+.form-group { margin-bottom: 18px; }
+.form-group label {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  margin-bottom: 7px;
+}
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(77,168,218,0.15);
+  border-radius: 9px;
+  padding: 12px 16px;
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.25s;
+  appearance: none;
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: rgba(232,160,32,0.45);
+  background: rgba(255,255,255,0.06);
+}
+.form-group textarea { height: 90px; resize: vertical; }
+.form-group select option { background: var(--midnight); }
+.form-submit {
+  width: 100%;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+  color: var(--midnight-deep);
+  border: none;
+  padding: 15px;
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s var(--transition);
+  margin-top: 8px;
+  letter-spacing: 0.2px;
+}
+.form-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(232,160,32,0.45);
+}
+.form-privacy {
+  margin-top: 14px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-align: center;
+  font-weight: 300;
+}
+
+/* Footer bottom */
+.footer-bottom {
+  border-top: 1px solid rgba(77,168,218,0.07);
+  padding: 30px 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.footer-nav {
+  display: flex; gap: 32px; list-style: none;
+}
+.footer-nav a {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.footer-nav a:hover { color: var(--text-primary); }
+.footer-copy {
+  font-size: 0.78rem;
+  color: rgba(136,146,176,0.5);
+}
+
+/* ─── ANIMATIONS / SCROLL REVEAL ──────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.75s var(--transition), transform 0.75s var(--transition);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+
+/* Responsive tweaks */
+@media (max-width: 1024px) {
+  nav { padding: 18px 30px; }
+  #hero { grid-template-columns: 1fr; padding: 110px 30px 60px; }
+  .hero-visual { display: none; }
+  .pillars-grid { grid-template-columns: 1fr; }
+  .value-inner { grid-template-columns: 1fr; gap: 50px; }
+  .value-sticky { position: static; }
+  .timeline-steps { grid-template-columns: 1fr 1fr; }
+  .timeline-line { display: none; }
+  .footer-cta { grid-template-columns: 1fr; gap: 50px; }
+  .footer-bottom { flex-direction: column; gap: 20px; text-align: center; }
+  #pillars, #value, #how, #footer .footer-cta { padding: 80px 30px; }
+  .footer-bottom { padding: 24px 30px; }
+  #proof { padding: 40px 30px; }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: clamp(2rem, 9.5vw, 2.6rem);
+    letter-spacing: -0.3px;
+    line-height: 1.12;
+  }
+  .section-title {
+    font-size: clamp(1.6rem, 7vw, 2.2rem);
+    letter-spacing: -0.2px;
+  }
+  .hero-sub { font-size: 1rem; }
+  .hero-stats { gap: 20px; flex-wrap: wrap; }
+  .stat-num { font-size: 1.5rem; }
+  .hero-badge { font-size: 0.7rem; letter-spacing: 0.4px; }
+  .nav-links { display: none; }
+  .pillar-title { font-size: 1.1rem; letter-spacing: -0.2px; }
+  .value-item-title { font-size: 1.05rem; }
+  .timeline-steps { grid-template-columns: 1fr; }
+  .contact-form { padding: 28px 20px; }
+  .form-title { font-size: 1.2rem; }
+  .afgift-tabs { flex-direction: column; }
+  .afgift-tab { width: 100%; justify-content: center; }
+  .result-grid { grid-template-columns: 1fr; }
+  .klagebox { padding: 28px 20px; }
+}
+
+/* ─── AFGIFT / KLAGE SEKTION ───────────────────────── */
+#afgift {
+  padding: 120px 60px;
+  background: linear-gradient(180deg, var(--midnight) 0%, var(--midnight-deep) 100%);
+  position: relative;
+  overflow: hidden;
+}
+#afgift::before {
+  content: '';
+  position: absolute;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(232,160,32,0.05) 0%, transparent 65%);
+  top: -100px; right: -100px;
+  pointer-events: none;
+}
+.afgift-inner {
+  max-width: 860px;
+  margin: 0 auto;
+}
+.afgift-header {
+  text-align: center;
+  margin-bottom: 52px;
+}
+.afgift-header .section-label { justify-content: center; }
+.afgift-header .section-label::before { display: none; }
+.afgift-header .section-sub { margin: 14px auto 0; text-align: center; }
+
+/* Tabs */
+.afgift-tabs {
+  display: flex;
+  gap: 10px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(77,168,218,0.1);
+  border-radius: 14px;
+  padding: 6px;
+  margin-bottom: 36px;
+}
+.afgift-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s var(--transition);
+}
+.afgift-tab.active {
+  background: rgba(232,160,32,0.12);
+  color: var(--gold);
+  border: 1px solid rgba(232,160,32,0.25);
+}
+.afgift-tab:hover:not(.active) {
+  color: var(--text-primary);
+  background: rgba(255,255,255,0.04);
+}
+.tab-icon { font-size: 1rem; }
+
+/* Search box */
+.search-panel {
+  display: none;
+}
+.search-panel.active { display: block; }
+
+.search-box {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(77,168,218,0.12);
+  border-radius: 18px;
+  padding: 36px 40px;
+  margin-bottom: 28px;
+}
+.search-box-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--white);
+  letter-spacing: -0.3px;
+  margin-bottom: 6px;
+}
+.search-box-sub {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 28px;
+  font-weight: 300;
+}
+.search-row {
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+}
+.search-input-wrap {
+  flex: 1;
+  position: relative;
+}
+.search-input-icon {
+  position: absolute;
+  left: 16px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+.search-input {
+  width: 100%;
+  background: rgba(255,255,255,0.05);
+  border: 1.5px solid rgba(77,168,218,0.18);
+  border-radius: 11px;
+  padding: 14px 16px 14px 44px;
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  outline: none;
+  transition: border-color 0.25s, background 0.25s;
+}
+.search-input::placeholder { color: var(--text-muted); letter-spacing: 0.5px; font-weight: 300; font-size: 0.9rem; }
+.search-input:focus {
+  border-color: rgba(232,160,32,0.5);
+  background: rgba(255,255,255,0.07);
+}
+.search-btn {
+  background: var(--gold);
+  color: var(--midnight-deep);
+  border: none;
+  padding: 14px 28px;
+  border-radius: 11px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s var(--transition);
+  white-space: nowrap;
+  display: flex; align-items: center; gap: 8px;
+}
+.search-btn:hover {
+  background: var(--gold-light);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 28px rgba(232,160,32,0.4);
+}
+.search-hint {
+  margin-top: 14px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  display: flex; align-items: center; gap: 6px;
+}
+
+/* Result card */
+.result-card {
+  display: none;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(77,168,218,0.1);
+  border-radius: 18px;
+  padding: 36px 40px;
+  margin-bottom: 28px;
+  animation: fadeSlideUp 0.5s var(--transition) both;
+}
+.result-card.visible { display: block; }
+.result-card.not-found {
+  border-color: rgba(239,68,68,0.2);
+  background: rgba(239,68,68,0.04);
+}
+.result-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+.result-title-wrap {}
+.result-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.result-lobenr {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--white);
+  letter-spacing: 1px;
+}
+.result-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 16px;
+  border-radius: 100px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.status-open {
+  background: rgba(251,191,36,0.12);
+  border: 1px solid rgba(251,191,36,0.3);
+  color: #FBB724;
+}
+.status-paid {
+  background: rgba(34,197,94,0.12);
+  border: 1px solid rgba(34,197,94,0.3);
+  color: #22C55E;
+}
+.status-closed {
+  background: rgba(239,68,68,0.12);
+  border: 1px solid rgba(239,68,68,0.3);
+  color: #EF4444;
+}
+.status-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 28px;
+}
+.result-field {}
+.result-field-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+.result-field-value {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+.result-field-value.highlight {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--gold);
+}
+.result-divider {
+  height: 1px;
+  background: rgba(77,168,218,0.08);
+  margin: 20px 0;
+}
+.result-desc {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+  font-weight: 300;
+}
+.result-actions {
+  margin-top: 24px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.btn-pay {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+  color: var(--midnight-deep);
+  border: none;
+  padding: 12px 28px;
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s var(--transition);
+  display: flex; align-items: center; gap: 8px;
+}
+.btn-pay:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(232,160,32,0.4); }
+.btn-klage {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid rgba(204,214,246,0.18);
+  padding: 12px 28px;
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s var(--transition);
+  display: flex; align-items: center; gap: 8px;
+}
+.btn-klage:hover {
+  border-color: rgba(232,160,32,0.35);
+  color: var(--gold);
+}
+
+/* Not found state */
+.not-found-inner { text-align: center; padding: 20px 0; }
+.not-found-icon { font-size: 2.5rem; margin-bottom: 16px; }
+.not-found-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 8px;
+}
+.not-found-text { font-size: 0.88rem; color: var(--text-muted); line-height: 1.7; }
+
+/* Klage form */
+.klagebox {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(77,168,218,0.1);
+  border-radius: 18px;
+  padding: 36px 40px;
+}
+.klagebox-header { margin-bottom: 28px; }
+.klagebox-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--white);
+  letter-spacing: -0.3px;
+  margin-bottom: 6px;
+}
+.klagebox-sub { font-size: 0.85rem; color: var(--text-muted); font-weight: 300; line-height: 1.65; }
+.klage-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.klage-grid .form-group { margin-bottom: 0; }
+.form-group.full { grid-column: 1 / -1; }
+.klage-reasons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 0;
+}
+.reason-option { display: none; }
+.reason-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(77,168,218,0.12);
+  border-radius: 9px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  transition: all 0.2s;
+  line-height: 1.3;
+}
+.reason-label::before {
+  content: '';
+  width: 16px; height: 16px;
+  border: 1.5px solid rgba(77,168,218,0.3);
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.reason-option:checked + .reason-label {
+  background: rgba(232,160,32,0.1);
+  border-color: rgba(232,160,32,0.3);
+  color: var(--gold);
+}
+.reason-option:checked + .reason-label::before {
+  background: var(--gold);
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(232,160,32,0.2);
+}
+.upload-area {
+  border: 1.5px dashed rgba(77,168,218,0.2);
+  border-radius: 11px;
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s;
+  background: rgba(255,255,255,0.02);
+}
+.upload-area:hover {
+  border-color: rgba(232,160,32,0.35);
+  background: rgba(232,160,32,0.04);
+}
+.upload-icon { font-size: 1.8rem; margin-bottom: 8px; }
+.upload-text { font-size: 0.82rem; color: var(--text-muted); line-height: 1.5; }
+.upload-text strong { color: var(--gold); }
+.klage-submit {
+  width: 100%;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+  color: var(--midnight-deep);
+  border: none;
+  padding: 15px;
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s var(--transition);
+  margin-top: 6px;
+}
+.klage-submit:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(232,160,32,0.45); }
+.klage-note {
+  margin-top: 16px;
+  padding: 14px 16px;
+  background: rgba(77,168,218,0.06);
+  border: 1px solid rgba(77,168,218,0.12);
+  border-radius: 9px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.65;
+}
+.klage-note strong { color: var(--tech-blue); }
+
+/* Success state */
+.success-state {
+  display: none;
+  text-align: center;
+  padding: 40px 20px;
+  animation: fadeSlideUp 0.5s var(--transition) both;
+}
+.success-state.visible { display: block; }
+.success-icon { font-size: 3rem; margin-bottom: 16px; }
+.success-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 10px;
+}
+.success-text { font-size: 0.9rem; color: var(--text-muted); line-height: 1.7; }
+.success-ref {
+  display: inline-block;
+  margin-top: 16px;
+  background: rgba(34,197,94,0.1);
+  border: 1px solid rgba(34,197,94,0.25);
+  color: #22C55E;
+  padding: 8px 20px;
+  border-radius: 100px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+}
+
+@media (max-width: 1024px) {
+  #afgift { padding: 80px 30px; }
+  .klage-grid { grid-template-columns: 1fr; }
+  .klage-reasons { grid-template-columns: 1fr; }
+  .search-row { flex-direction: column; }
+  .search-btn { width: 100%; justify-content: center; }
+  .result-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ─── NAV ─────────────────────────────────────────── -->
+<nav>
+  <div class="nav-logo">Navia<span>park</span></div>
+  <ul class="nav-links">
+    <li><a href="#pillars">Løsninger</a></li>
+    <li><a href="#value">Fordele</a></li>
+    <li><a href="#how">Sådan fungerer det</a></li>
+    <li><a href="#afgift">Afgift / Klage</a></li>
+    <li><a href="#footer">Kontakt</a></li>
+  </ul>
+  <button class="nav-cta" onclick="document.getElementById('footer').scrollIntoView({behavior:'smooth'})">Gratis vurdering →</button>
+</nav>
+
+<!-- ─── HERO ─────────────────────────────────────────── -->
+<section id="hero">
+  <div class="hero-bg-grid"></div>
+  <div class="hero-noise"></div>
+
+  <div class="hero-content">
+    <div class="hero-badge">Intelligent parkering · Danmarks fremtid</div>
+    <h1>Dit areal.<br><em>Vores ekspertise.</em><br>Nul besvær.</h1>
+    <p class="hero-sub">
+      Naviapark omdanner uudnyttede parkeringsarealer til velsmurte, digitale indtægtskilder – uden at du behøver løfte en finger. Automatiseret drift, transparent afrapportering og menneskelig service i øjenhøjde.
+    </p>
+    <div class="hero-ctas">
+      <a href="#footer" class="btn-primary">Få gratis arealvurdering →</a>
+      <a href="#how" class="btn-secondary">Se hvordan det virker</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-num">98<span>%</span></div>
+        <div class="stat-label">Automatiseret drift</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <div class="stat-num">+40<span>%</span></div>
+        <div class="stat-label">Gennemsnitlig omsætningsstigning</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <div class="stat-num">0</div>
+        <div class="stat-label">Administrative opgaver for grundejer</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="hero-3d-scene">
+      <div class="scene-glow"></div>
+
+      <!-- Floating info cards -->
+      <div class="float-card fc1">
+        <div class="float-card-icon">📡</div>
+        <div class="float-card-text">
+          <strong>ANPR Kamera aktiv</strong>
+          <span>Nummerpladeregistrering · live</span>
+        </div>
+      </div>
+
+      <div class="float-card fc2">
+        <div class="float-card-icon">💳</div>
+        <div class="float-card-text">
+          <strong>Automatisk faktura</strong>
+          <span>Betalt · 14:42</span>
+        </div>
+      </div>
+
+      <div class="float-card fc3">
+        <div class="float-card-icon">📊</div>
+        <div class="float-card-text">
+          <strong>Månedlig rapport</strong>
+          <span>Sendt til din indbakke</span>
+        </div>
+      </div>
+
+      <div class="float-card fc4">
+        <div class="float-card-icon">🛡️</div>
+        <div class="float-card-text">
+          <strong>Belægningsgrad: 94%</strong>
+          <span>Optimal udnyttelse</span>
+        </div>
+      </div>
+
+      <!-- Central parking SVG illustration -->
+      <div class="parking-structure">
+        <svg class="parking-svg" viewBox="0 0 240 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Parking structure base -->
+          <rect x="20" y="100" width="200" height="80" rx="8" fill="#112240" stroke="rgba(77,168,218,0.3)" stroke-width="1.5"/>
+          <!-- Level 1 -->
+          <rect x="30" y="70" width="180" height="35" rx="6" fill="#0F1E38" stroke="rgba(77,168,218,0.2)" stroke-width="1.5"/>
+          <!-- Level 2 -->
+          <rect x="40" y="42" width="160" height="32" rx="6" fill="#0D1B33" stroke="rgba(77,168,218,0.15)" stroke-width="1.5"/>
+          <!-- Ramp -->
+          <path d="M180 100 L210 70" stroke="rgba(232,160,32,0.5)" stroke-width="2" stroke-dasharray="4 3"/>
+          <!-- P sign -->
+          <circle cx="120" cy="86" r="14" fill="rgba(232,160,32,0.2)" stroke="rgba(232,160,32,0.6)" stroke-width="1.5"/>
+          <text x="120" y="91" text-anchor="middle" font-family="Syne,sans-serif" font-size="14" font-weight="800" fill="#E8A020">P</text>
+          <!-- Car 1 -->
+          <rect x="50" y="112" width="46" height="22" rx="5" fill="#1E3A5F" stroke="rgba(77,168,218,0.4)" stroke-width="1"/>
+          <rect x="57" y="115" width="32" height="10" rx="3" fill="rgba(77,168,218,0.2)"/>
+          <circle cx="57" cy="136" r="5" fill="#0A192F" stroke="rgba(77,168,218,0.5)" stroke-width="1.5"/>
+          <circle cx="89" cy="136" r="5" fill="#0A192F" stroke="rgba(77,168,218,0.5)" stroke-width="1.5"/>
+          <!-- Car 2 -->
+          <rect x="140" y="112" width="46" height="22" rx="5" fill="#1E3A5F" stroke="rgba(232,160,32,0.4)" stroke-width="1"/>
+          <rect x="147" y="115" width="32" height="10" rx="3" fill="rgba(232,160,32,0.15)"/>
+          <circle cx="147" cy="136" r="5" fill="#0A192F" stroke="rgba(232,160,32,0.5)" stroke-width="1.5"/>
+          <circle cx="179" cy="136" r="5" fill="#0A192F" stroke="rgba(232,160,32,0.5)" stroke-width="1.5"/>
+          <!-- Scan line animation -->
+          <line x1="20" y1="90" x2="220" y2="90" stroke="rgba(77,168,218,0.15)" stroke-width="1.5">
+            <animate attributeName="y1" values="70;180;70" dur="3s" repeatCount="indefinite"/>
+            <animate attributeName="y2" values="70;180;70" dur="3s" repeatCount="indefinite"/>
+          </line>
+          <!-- Ground markings -->
+          <line x1="96" y1="148" x2="96" y2="180" stroke="rgba(232,160,32,0.3)" stroke-width="1.5" stroke-dasharray="4 4"/>
+          <line x1="143" y1="148" x2="143" y2="180" stroke="rgba(232,160,32,0.3)" stroke-width="1.5" stroke-dasharray="4 4"/>
+          <!-- Stars/nodes -->
+          <circle cx="32" cy="52" r="3" fill="rgba(232,160,32,0.6)"><animate attributeName="opacity" values="0.4;1;0.4" dur="2.5s" repeatCount="indefinite"/></circle>
+          <circle cx="208" cy="52" r="3" fill="rgba(77,168,218,0.6)"><animate attributeName="opacity" values="1;0.4;1" dur="2s" repeatCount="indefinite"/></circle>
+          <circle cx="120" cy="28" r="3" fill="rgba(232,160,32,0.5)"><animate attributeName="opacity" values="0.6;1;0.6" dur="3s" repeatCount="indefinite"/></circle>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── SOCIAL PROOF ─────────────────────────────────── -->
+<section id="proof">
+  <div class="proof-inner">
+    <span class="proof-label">Betroet af</span>
+    <div class="proof-logos">
+      <span class="proof-logo">Boligforeningen Øst</span>
+      <span class="proof-logo">CenterHuset</span>
+      <span class="proof-logo">TowerPark</span>
+      <span class="proof-logo">HarbourGate</span>
+      <span class="proof-logo">NordByg A/S</span>
+    </div>
+  </div>
+</section>
+
+<!-- ─── SECTION 2: THREE PILLARS ─────────────────────── -->
+<section id="pillars">
+  <div class="pillars-header reveal">
+    <div class="section-label">Vores platform</div>
+    <h2 class="section-title" style="margin-bottom:14px">Tre digitale søjler.<br>Én integreret løsning.</h2>
+    <p class="section-sub" style="margin:0 auto;text-align:center">Alt hvad din parkering har brug for, samlet i ét intelligent system – drevet af teknologi, forankret i menneskelig service.</p>
+  </div>
+
+  <div class="pillars-grid">
+
+    <!-- Card 1 -->
+    <div class="pillar-card reveal reveal-delay-1">
+      <!-- [Design note: 3D animated icon – svævende holografisk fakturaark med kreditkort, lys 
+           amber glow, roterer subtilt 3–5° ved hover, drop-shadow i guld-tone] -->
+      <div class="pillar-icon-wrap">
+        <div class="pillar-icon-bg"></div>
+        <div class="pillar-icon-inner">🧾</div>
+      </div>
+      <div class="pillar-title">Administration<br>& Fakturering</div>
+      <p class="pillar-text">
+        Glem papirfakturaer, manuelle opkrævninger og kedelig administration. Vores platform håndterer hele betalingskæden automatisk – fra scanning til bogføring – og frigiver din tid til det, der skaber reel værdi.
+      </p>
+      <ul class="pillar-tag-list">
+        <li class="pillar-tag">Automatisk opkrævning og PBS-integration</li>
+        <li class="pillar-tag">Sikker digital fakturahåndtering</li>
+        <li class="pillar-tag">Månedlige transparente afregninger</li>
+        <li class="pillar-tag">Løbende støtte fra dedikeret kontaktperson</li>
+      </ul>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="pillar-card reveal reveal-delay-2">
+      <!-- [Design note: 3D animeret ANPR-kamera med laser-scanning-effect, parkeringsplads 
+           set oppefra, nummerplade lyser op i guld-farve ved hover – smooth perspektiv-rotation] -->
+      <div class="pillar-icon-wrap">
+        <div class="pillar-icon-bg"></div>
+        <div class="pillar-icon-inner">📡</div>
+      </div>
+      <div class="pillar-title">Optimering af<br>Parkeringsareal</div>
+      <p class="pillar-text">
+        Intelligent ANPR-teknologi identificerer automatisk indregistrerede køretøjer, opdager ulovlig parkering og maksimerer belægningsgraden. Resultat: op til 40% højere omsætning på samme areal.
+      </p>
+      <ul class="pillar-tag-list">
+        <li class="pillar-tag">ANPR-kameraer med 99,7% præcision</li>
+        <li class="pillar-tag">Realtidsovervågning og pladstælling</li>
+        <li class="pillar-tag">Automatiseret kontrol uden P-vagter</li>
+        <li class="pillar-tag">Fleksible tariffer og tidsintervaller</li>
+      </ul>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="pillar-card reveal reveal-delay-3">
+      <!-- [Design note: 3D smartphone med en lysende dashboard-UI, tilladelser/badges flyver 
+           ud fra skærmen som holografiske kort – tech-blå neon outline, svæver og roterer] -->
+      <div class="pillar-icon-wrap">
+        <div class="pillar-icon-bg"></div>
+        <div class="pillar-icon-inner">📱</div>
+      </div>
+      <div class="pillar-title">Digital Platform<br>& Nem Håndtering</div>
+      <p class="pillar-text">
+        Ét centraliseret dashboard giver dig og dine beboere/lejere fuld kontrol. Udsted digitale tilladelser på sekunder, administrer gæsteparkering og følg aktiviteten live – fra enhver enhed, hvor som helst.
+      </p>
+      <ul class="pillar-tag-list">
+        <li class="pillar-tag">Centraliseret portal til alle tilladelser</li>
+        <li class="pillar-tag">Gæsteparkering med QR-kode og SMS</li>
+        <li class="pillar-tag">App til beboere og administratorer</li>
+        <li class="pillar-tag">Live-data og historisk statistik</li>
+      </ul>
+    </div>
+
+  </div>
+</section>
+
+<!-- ─── SECTION 3: VALUE PROPOSITION ─────────────────── -->
+<section id="value">
+  <div class="value-inner">
+
+    <div class="value-sticky reveal">
+      <div class="section-label">Hvorfor Naviapark</div>
+      <h2 class="section-title">Partnerskab,<br>ikke bare<br><em style="font-style:normal;color:var(--gold)">et produkt.</em></h2>
+      <p class="section-sub">
+        Vi bygger langtidsrelationer baseret på gennemsigtighed, ærlighed og fælles succes. Hos os er du aldrig bare et cpr-nummer i et system.
+      </p>
+      <div class="value-avatar">
+        <div class="avatar-img">NK</div>
+        <div class="avatar-text">
+          <strong>Niels Kjær, Kundeansvarlig</strong>
+          <span>Personlig kontakt · Svarer inden for 2 timer</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="value-list">
+
+      <div class="value-item reveal reveal-delay-1">
+        <div class="value-item-accent"></div>
+        <div class="value-item-num">01 · Tillid</div>
+        <div class="value-item-title">Fuld transparens, altid</div>
+        <p class="value-item-text">Du modtager en detaljeret månedlig rapport med præcise tal, belægningsgrad og afregning. Ingen skjulte gebyrer. Ingen overraskelser. Du véd altid præcis, hvad der sker på dit areal.</p>
+      </div>
+
+      <div class="value-item reveal reveal-delay-2">
+        <div class="value-item-accent"></div>
+        <div class="value-item-num">02 · Service</div>
+        <div class="value-item-title">Menneskelig service i øjenhøjde</div>
+        <p class="value-item-text">Vi er ikke et callcenter. Du har én fast kontaktperson, der kender dit anlæg, din situation og dine mål. Problemer løses proaktivt – ikke reaktivt.</p>
+      </div>
+
+      <div class="value-item reveal reveal-delay-3">
+        <div class="value-item-accent"></div>
+        <div class="value-item-num">03 · Bilistoplevelse</div>
+        <div class="value-item-title">Parkering der skaber goodwill</div>
+        <p class="value-item-text">En god parkeringsoplevelse styrker dit brand. Vores system er designet med bilisten i fokus: klare skilte, nem betaling og rimelig håndhævelse. Vi sørger for, at kontrol aldrig skaber unødvendige konflikter.</p>
+      </div>
+
+      <div class="value-item reveal reveal-delay-4">
+        <div class="value-item-accent"></div>
+        <div class="value-item-num">04 · Sikkerhed</div>
+        <div class="value-item-title">Juridisk og teknisk fundament</div>
+        <p class="value-item-text">Vi opererer fuldt ud i overensstemmelse med dansk lovgivning og GDPR. Vores processer er dokumenterede, vores klagesystem er rimeligt, og vores sanktioner er proportionelle. Du er altid dækket.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─── SECTION 4: HOW IT WORKS ─────────────────────── -->
+<section id="how">
+  <div class="how-header reveal">
+    <div class="section-label">Processen</div>
+    <h2 class="section-title" style="margin-bottom:14px">Fra areal til<br>automatiseret drift.</h2>
+    <p class="section-sub" style="margin:0 auto;text-align:center">Et friktionsløst forløb fra den første uforpligtende dialog til fuldt kørende, digital parkeringsdrift.</p>
+  </div>
+
+  <!-- [Design note: Horisontal animeret tidslinje med lysende guldlinje der skrider frem ved 
+       scroll. Hvert ikon er et 3D-objekt: mikroskop → gps-pin → kamera-hardware → 
+       app-interface → rapport-ark. De lyser én ad gangen i amber-guld med soft glow.] -->
+  <div class="timeline reveal">
+    <div class="timeline-line">
+      <div class="timeline-progress" id="timelineProgress"></div>
+    </div>
+    <div class="timeline-steps">
+
+      <div class="timeline-step">
+        <div class="step-dot-wrap">
+          <div class="step-dot active" id="step1">
+            🔍
+            <div class="step-num">1</div>
+          </div>
+        </div>
+        <div class="step-title">Gratis arealanalyse</div>
+        <p class="step-text">Vi besøger dit areal, vurderer potentialet og præsenterer en konkret, uforpligtende anbefaling med estimeret omsætning.</p>
+      </div>
+
+      <div class="timeline-step">
+        <div class="step-dot-wrap">
+          <div class="step-dot" id="step2">
+            📋
+            <div class="step-num">2</div>
+          </div>
+        </div>
+        <div class="step-title">Skræddersyet aftale</div>
+        <p class="step-text">Vi udarbejder en klar og fair driftsaftale tilpasset dit anlæg og dine ønsker. Ingen standardkontrakter, ingen skjult tekst.</p>
+      </div>
+
+      <div class="timeline-step">
+        <div class="step-dot-wrap">
+          <div class="step-dot" id="step3">
+            🔧
+            <div class="step-num">3</div>
+          </div>
+        </div>
+        <div class="step-title">Hardware & Opsætning</div>
+        <p class="step-text">Vores teknikere installerer ANPR-kameraer, skilte og digital infrastruktur. Alt sker hurtigt og diskret – du mærker ingenting.</p>
+      </div>
+
+      <div class="timeline-step">
+        <div class="step-dot-wrap">
+          <div class="step-dot" id="step4">
+            🚀
+            <div class="step-num">4</div>
+          </div>
+        </div>
+        <div class="step-title">Go-live & Drift</div>
+        <p class="step-text">Systemet aktiveres. Fra dag ét er din parkering intelligent styret, overvåget og fuldt operationel – uden din indblanding.</p>
+      </div>
+
+      <div class="timeline-step">
+        <div class="step-dot-wrap">
+          <div class="step-dot" id="step5">
+            📈
+            <div class="step-num">5</div>
+          </div>
+        </div>
+        <div class="step-title">Løbende optimering</div>
+        <p class="step-text">Månedlige rapporter, løbende optimering af tariffer og direkte dialog med din kontaktperson. Vi stopper aldrig med at forbedre.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─── AFGIFT / KLAGE SEKTION ──────────────────────── -->
+<section id="afgift">
+  <div class="afgift-inner">
+
+    <div class="afgift-header reveal">
+      <div class="section-label">Selvbetjening</div>
+      <h2 class="section-title">Afgift eller klage?<br><em style="font-style:normal;color:var(--gold)">Find din sag her.</em></h2>
+      <p class="section-sub">Slå dit løbenummer op for at se din afgifts detaljer, betale online eller indgive en begrundet klage. Vi behandler alle klager seriøst og vender tilbage inden for 5 hverdage.</p>
+    </div>
+
+    <!-- Tab-switcher -->
+    <div class="afgift-tabs reveal reveal-delay-1">
+      <button class="afgift-tab active" onclick="switchTab('soeg')" id="tab-soeg">
+        <span class="tab-icon">🔍</span> Søg på løbenummer
+      </button>
+      <button class="afgift-tab" onclick="switchTab('klage')" id="tab-klage">
+        <span class="tab-icon">📋</span> Indgiv klage
+      </button>
+    </div>
+
+    <!-- ── SØGE-PANEL ─────────────────────────────── -->
+    <div class="search-panel active reveal reveal-delay-2" id="panel-soeg">
+
+      <div class="search-box">
+        <div class="search-box-title">Find din parkeringsafgift</div>
+        <div class="search-box-sub">Løbenummeret finder du øverst på din afgiftskvittering, f.eks. <strong style="color:var(--text-primary);font-weight:600">NP-2024-048291</strong></div>
+        <div class="search-row">
+          <div class="search-input-wrap">
+            <span class="search-input-icon">🔢</span>
+            <input class="search-input" id="lobenrInput" type="text" placeholder="F.eks. NP-2024-048291" maxlength="20" oninput="this.value = this.value.toUpperCase()">
+          </div>
+          <button class="search-btn" onclick="searchAfgift()">
+            Søg <span>→</span>
+          </button>
+        </div>
+        <div class="search-hint">ℹ️ Løbenummeret er angivet øverst til højre på afgiftsblanketten</div>
+      </div>
+
+      <!-- Result: found -->
+      <div class="result-card" id="resultFound">
+        <div class="result-header">
+          <div class="result-title-wrap">
+            <div class="result-label">Parkeringsafgift</div>
+            <div class="result-lobenr" id="resultLobenr">NP-2024-048291</div>
+          </div>
+          <div class="result-status status-open" id="resultStatus">
+            <span class="status-dot"></span> Ubetalt
+          </div>
+        </div>
+
+        <div class="result-grid">
+          <div class="result-field">
+            <div class="result-field-label">Beløb</div>
+            <div class="result-field-value highlight" id="resultBelob">750 kr.</div>
+          </div>
+          <div class="result-field">
+            <div class="result-field-label">Udstedt</div>
+            <div class="result-field-value" id="resultDato">14. jan. 2025 · 11:32</div>
+          </div>
+          <div class="result-field">
+            <div class="result-field-label">Forfaldsdato</div>
+            <div class="result-field-value" id="resultForfald">28. jan. 2025</div>
+          </div>
+          <div class="result-field">
+            <div class="result-field-label">Lokation</div>
+            <div class="result-field-value" id="resultLokation">Roskildevej 45, Cph</div>
+          </div>
+          <div class="result-field">
+            <div class="result-field-label">Nummerplade</div>
+            <div class="result-field-value" id="resultNummerplade">AB 12 345</div>
+          </div>
+          <div class="result-field">
+            <div class="result-field-label">Overtrædelse</div>
+            <div class="result-field-value" id="resultOvertraedelse">Parkering uden tilladelse</div>
+          </div>
+        </div>
+
+        <div class="result-divider"></div>
+        <div class="result-desc" id="resultDesc">
+          Køretøjet stod parkeret uden gyldig tilladelse på et afgrænset privat parkeringsareal tilhørende Roskildevej 45. Afgiften er udstedt i henhold til skiltning på stedet og gældende dansk lovgivning om parkering på private arealer.
+        </div>
+
+        <div class="result-actions">
+          <button class="btn-pay" id="payBtn" onclick="showPaySuccess()">💳 Betal afgift online</button>
+          <button class="btn-klage" onclick="switchTab('klage', resultLobenr.textContent)">📋 Klage over afgiften</button>
+        </div>
+      </div>
+
+      <!-- Result: not found -->
+      <div class="result-card not-found" id="resultNotFound">
+        <div class="not-found-inner">
+          <div class="not-found-icon">🔎</div>
+          <div class="not-found-title">Løbenummer ikke fundet</div>
+          <p class="not-found-text">Vi kunne ikke finde en afgift med det angivne løbenummer.<br>Kontrollér venligst nummeret og prøv igen. Har du stadig problemer, er du velkommen til at <a href="#footer" style="color:var(--gold);text-decoration:none">kontakte os direkte</a>.</p>
+        </div>
+      </div>
+
+      <!-- Pay success -->
+      <div class="result-card" id="paySuccess" style="border-color:rgba(34,197,94,0.2);background:rgba(34,197,94,0.03);">
+        <div class="success-state visible" style="display:block">
+          <div class="success-icon">✅</div>
+          <div class="success-title">Betaling gennemført</div>
+          <p class="success-text">Din afgift er betalt og registreret i vores system. Du modtager en kvittering på din e-mailadresse inden for få minutter.</p>
+          <div class="success-ref" id="payRef">Ref: NP-PAY-2025-048291</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── KLAGE-PANEL ─────────────────────────────── -->
+    <div class="search-panel reveal reveal-delay-2" id="panel-klage">
+      <div class="klagebox">
+        <div class="klagebox-header">
+          <div class="klagebox-title">Klage over parkeringsafgift</div>
+          <div class="klagebox-sub">Udfyld formularen herunder. Vi behandler alle klager inden for <strong style="color:var(--text-primary);font-weight:600">5 hverdage</strong> og giver dig et skriftligt svar. Din klage vurderes altid af et menneske – aldrig en algoritme.</div>
+        </div>
+
+        <div id="klageFormWrap">
+          <div class="klage-grid">
+            <div class="form-group">
+              <label>Løbenummer på afgiften</label>
+              <input type="text" id="klageLobenr" placeholder="NP-2024-XXXXXX" style="background:rgba(255,255,255,0.04);border:1.5px solid rgba(77,168,218,0.18);border-radius:9px;padding:12px 16px;color:var(--white);font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none;width:100%;transition:border-color 0.25s;letter-spacing:1px;">
+            </div>
+            <div class="form-group">
+              <label>Nummerplade</label>
+              <input type="text" placeholder="AB 12 345" style="background:rgba(255,255,255,0.04);border:1.5px solid rgba(77,168,218,0.18);border-radius:9px;padding:12px 16px;color:var(--white);font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none;width:100%;transition:border-color 0.25s;text-transform:uppercase;">
+            </div>
+            <div class="form-group">
+              <label>Dit navn</label>
+              <input type="text" placeholder="Fornavn Efternavn" style="background:rgba(255,255,255,0.04);border:1.5px solid rgba(77,168,218,0.18);border-radius:9px;padding:12px 16px;color:var(--white);font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none;width:100%;transition:border-color 0.25s;">
+            </div>
+            <div class="form-group">
+              <label>E-mailadresse</label>
+              <input type="email" placeholder="navn@email.dk" style="background:rgba(255,255,255,0.04);border:1.5px solid rgba(77,168,218,0.18);border-radius:9px;padding:12px 16px;color:var(--white);font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none;width:100%;transition:border-color 0.25s;">
+            </div>
+
+            <div class="form-group full">
+              <label style="display:block;font-size:0.78rem;color:var(--text-muted);font-weight:500;letter-spacing:0.5px;margin-bottom:12px;">Klagegrundlag – vælg det der passer bedst</label>
+              <div class="klage-reasons">
+                <input type="radio" name="reason" id="r1" class="reason-option" value="tilladelse">
+                <label for="r1" class="reason-label">Jeg havde gyldig tilladelse</label>
+                <input type="radio" name="reason" id="r2" class="reason-option" value="skiltning">
+                <label for="r2" class="reason-label">Uklar eller manglende skiltning</label>
+                <input type="radio" name="reason" id="r3" class="reason-option" value="fejl">
+                <label for="r3" class="reason-label">Fejl på nummerplade eller dato</label>
+                <input type="radio" name="reason" id="r4" class="reason-option" value="nod">
+                <label for="r4" class="reason-label">Nødstop / akut situation</label>
+                <input type="radio" name="reason" id="r5" class="reason-option" value="andet">
+                <label for="r5" class="reason-label">Andet (beskriv nedenfor)</label>
+                <input type="radio" name="reason" id="r6" class="reason-option" value="ejer">
+                <label for="r6" class="reason-label">Jeg er ikke køretøjets ejer</label>
+              </div>
+            </div>
+
+            <div class="form-group full">
+              <label style="display:block;font-size:0.78rem;color:var(--text-muted);font-weight:500;letter-spacing:0.5px;margin-bottom:7px;">Uddybende beskrivelse</label>
+              <textarea placeholder="Beskriv din situation så præcist som muligt. Jo mere dokumentation du giver, jo hurtigere kan vi behandle din klage..." style="width:100%;height:120px;background:rgba(255,255,255,0.04);border:1.5px solid rgba(77,168,218,0.18);border-radius:9px;padding:12px 16px;color:var(--white);font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none;resize:vertical;transition:border-color 0.25s;line-height:1.6;"></textarea>
+            </div>
+
+            <div class="form-group full">
+              <label style="display:block;font-size:0.78rem;color:var(--text-muted);font-weight:500;letter-spacing:0.5px;margin-bottom:10px;">Dokumentation (valgfrit)</label>
+              <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                <input type="file" id="fileInput" style="display:none" multiple accept="image/*,.pdf" onchange="handleFiles(this)">
+                <div class="upload-icon">📎</div>
+                <div class="upload-text">
+                  <strong>Klik for at uploade</strong> eller træk filer hertil<br>
+                  Billeder, parkerings­kvittering, lejekontrakt, mv. (maks. 10 MB)
+                </div>
+                <div id="fileList" style="margin-top:10px;font-size:0.78rem;color:var(--gold);"></div>
+              </div>
+            </div>
+          </div>
+
+          <button class="klage-submit" onclick="submitKlage()" style="margin-top:24px">Indsend klage →</button>
+
+          <div class="klage-note">
+            <strong>ℹ️ Sagsbehandling:</strong> Vi bekræfter modtagelse af din klage inden for 24 timer og giver dig et endeligt svar inden for 5 hverdage. Afgiften suspenderes ikke automatisk under behandlingen, men vi tilbyder betalingsudsættelse ved berettigede klager. Din klage behandles i henhold til gældende dansk lovgivning.
+          </div>
+        </div>
+
+        <!-- Klage success -->
+        <div class="success-state" id="klageSuccess">
+          <div class="success-icon">📬</div>
+          <div class="success-title">Klage modtaget</div>
+          <p class="success-text">Vi har modtaget din klage og sender dig en bekræftelse på e-mail inden for 24 timer. En af vores sagsbehandlere vurderer din sag og vender tilbage inden for 5 hverdage.</p>
+          <div class="success-ref" id="klageRef">Sagsnr: KL-2025-008847</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ─── FOOTER CTA ──────────────────────────────────── -->
+<section id="footer">
+  <div class="footer-cta">
+
+    <div class="footer-cta-text reveal">
+      <div class="section-label">Kom i gang</div>
+      <h2 class="section-title">Klar til at se<br>dit areals<br><em style="font-style:normal;color:var(--gold)">fulde potentiale?</em></h2>
+      <p class="section-sub">Book en gratis, uforpligtende vurdering af dit parkeringsareal. Vores eksperter analyserer potentialet og giver dig et konkret svar inden for 48 timer.</p>
+
+      <div class="footer-trust">
+        <div class="trust-item">
+          <div class="trust-icon">✓</div>
+          <span>100% uforpligtende – ingen binding ved første møde</span>
+        </div>
+        <div class="trust-item">
+          <div class="trust-icon">⚡</div>
+          <span>Svar inden for 48 timer fra vores parkeringsspecialist</span>
+        </div>
+        <div class="trust-item">
+          <div class="trust-icon">🔒</div>
+          <span>Dine data behandles sikkert og i henhold til GDPR</span>
+        </div>
+        <div class="trust-item">
+          <div class="trust-icon">📞</div>
+          <span>Personlig dialog – aldrig et generisk tilbud</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- [Design note: Kontaktformular med mørk glasmorphism-baggrund, fokusstate lyser 
+         op i amber-guld, submit-knap har gradient og levitationseffekt ved hover] -->
+    <div class="contact-form reveal reveal-delay-2">
+      <div class="form-title">Få din gratis vurdering</div>
+      <div class="form-sub">Udfyld formularen – vi vender tilbage inden for 48 timer</div>
+
+      <div class="form-group">
+        <label>Dit navn</label>
+        <input type="text" placeholder="Fornavn Efternavn">
+      </div>
+      <div class="form-group">
+        <label>E-mailadresse</label>
+        <input type="email" placeholder="navn@virksomhed.dk">
+      </div>
+      <div class="form-group">
+        <label>Telefonnummer</label>
+        <input type="tel" placeholder="+45 00 00 00 00">
+      </div>
+      <div class="form-group">
+        <label>Type parkeringsareal</label>
+        <select>
+          <option value="">Vælg areal-type</option>
+          <option>Boligforening / Ejerforening</option>
+          <option>Erhvervsejendom / Kontor</option>
+          <option>Indkøbscenter / Retail</option>
+          <option>Hotel / Hospitality</option>
+          <option>Privat areal / Andet</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Antal parkeringspladser (ca.)</label>
+        <input type="text" placeholder="F.eks. 40">
+      </div>
+      <div class="form-group">
+        <label>Eventuelle kommentarer</label>
+        <textarea placeholder="Beskriv kort din nuværende situation eller særlige ønsker..."></textarea>
+      </div>
+
+      <button class="form-submit">Send og få gratis vurdering →</button>
+      <div class="form-privacy">🔒 Vi deler aldrig dine oplysninger med tredjepart</div>
+    </div>
+
+  </div>
+
+  <div class="footer-bottom">
+    <div class="nav-logo" style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:var(--white);">Navia<span style="color:var(--gold)">park</span></div>
+    <ul class="footer-nav">
+      <li><a href="#">Persondatapolitik</a></li>
+      <li><a href="#">Vilkår & betingelser</a></li>
+      <li><a href="#">Klageformular</a></li>
+      <li><a href="#">Presse</a></li>
+    </ul>
+    <div class="footer-copy">© 2025 Naviapark · Alle rettigheder forbeholdes</div>
+  </div>
+</section>
+
+<script>
+// ─── Scroll reveal
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.12 });
+reveals.forEach(el => observer.observe(el));
+
+// ─── Timeline animation
+const steps = document.querySelectorAll('.step-dot');
+const progressBar = document.getElementById('timelineProgress');
+const timelineEl = document.querySelector('.timeline');
+
+const timelineObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      let step = 0;
+      const interval = setInterval(() => {
+        if (step < steps.length) {
+          steps[step].classList.add('active');
+          const pct = ((step + 1) / steps.length) * 100;
+          if (progressBar) progressBar.style.width = pct + '%';
+          step++;
+        } else {
+          clearInterval(interval);
+        }
+      }, 400);
+      timelineObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.3 });
+if (timelineEl) timelineObs.observe(timelineEl);
+
+// ─── Nav scroll effect
+const nav = document.querySelector('nav');
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 60) {
+    nav.style.background = 'rgba(4,12,24,0.92)';
+    nav.style.borderBottomColor = 'rgba(77,168,218,0.12)';
+  } else {
+    nav.style.background = 'rgba(6,15,30,0.72)';
+    nav.style.borderBottomColor = 'rgba(77,168,218,0.08)';
+  }
+});
+
+// ─── Tab switcher
+function switchTab(tab, prefillLobenr) {
+  document.querySelectorAll('.afgift-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.search-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.getElementById('panel-' + tab).classList.add('active');
+  if (prefillLobenr) {
+    document.getElementById('klageLobenr').value = prefillLobenr;
+  }
+}
+
+// ─── Demo data for search
+const demoData = {
+  'NP-2024-048291': {
+    belob: '750 kr.',
+    dato: '14. jan. 2025 · 11:32',
+    forfald: '28. jan. 2025',
+    lokation: 'Roskildevej 45, Cph',
+    nummerplade: 'AB 12 345',
+    overtraedelse: 'Parkering uden tilladelse',
+    status: 'open',
+    statusText: 'Ubetalt',
+    desc: 'Køretøjet stod parkeret uden gyldig tilladelse på et afgrænset privat parkeringsareal tilhørende Roskildevej 45. Afgiften er udstedt i henhold til skiltning på stedet og gældende dansk lovgivning.'
+  },
+  'NP-2025-001122': {
+    belob: '510 kr.',
+    dato: '3. mar. 2025 · 09:14',
+    forfald: '17. mar. 2025',
+    lokation: 'Vesterbrogade 12, Cph',
+    nummerplade: 'CD 45 678',
+    overtraedelse: 'Overskredet parkeringstid',
+    status: 'open',
+    statusText: 'Ubetalt',
+    desc: 'Køretøjet har overskredet den tilladte parkeringstid på 2 timer. Maksimaltiden er tydeligt skiltet ved alle indkørsler til parkeringsarealet.'
+  },
+  'NP-2024-033887': {
+    belob: '750 kr.',
+    dato: '22. nov. 2024 · 15:58',
+    forfald: 'Betalt 30. nov. 2024',
+    lokation: 'Nørrebrogade 88, Cph',
+    nummerplade: 'EF 78 901',
+    overtraedelse: 'Parkering i brandvej',
+    status: 'paid',
+    statusText: 'Betalt',
+    desc: 'Afgiften er betalt og afsluttet. Tak for din betaling.'
+  }
+};
+
+function searchAfgift() {
+  const raw = document.getElementById('lobenrInput').value.trim().toUpperCase();
+  const found = document.getElementById('resultFound');
+  const notFound = document.getElementById('resultNotFound');
+  const paySuccess = document.getElementById('paySuccess');
+
+  found.classList.remove('visible');
+  notFound.classList.remove('visible');
+  paySuccess.classList.remove('visible');
+  found.style.display = 'none';
+  notFound.style.display = 'none';
+  paySuccess.style.display = 'none';
+
+  if (!raw) { return; }
+
+  setTimeout(() => {
+    const data = demoData[raw];
+    if (data) {
+      document.getElementById('resultLobenr').textContent = raw;
+      document.getElementById('resultBelob').textContent = data.belob;
+      document.getElementById('resultDato').textContent = data.dato;
+      document.getElementById('resultForfald').textContent = data.forfald;
+      document.getElementById('resultLokation').textContent = data.lokation;
+      document.getElementById('resultNummerplade').textContent = data.nummerplade;
+      document.getElementById('resultOvertraedelse').textContent = data.overtraedelse;
+      document.getElementById('resultDesc').textContent = data.desc;
+      const statusEl = document.getElementById('resultStatus');
+      statusEl.className = 'result-status status-' + data.status;
+      statusEl.innerHTML = '<span class="status-dot"></span> ' + data.statusText;
+      const payBtn = document.getElementById('payBtn');
+      if (data.status === 'paid') {
+        payBtn.style.display = 'none';
+      } else {
+        payBtn.style.display = 'flex';
+        payBtn.onclick = () => showPaySuccess(raw);
+      }
+      found.style.display = 'block';
+      found.classList.add('visible');
+    } else {
+      notFound.style.display = 'block';
+      notFound.classList.add('visible');
+    }
+  }, 320);
+}
+
+function showPaySuccess(lobenr) {
+  document.getElementById('resultFound').style.display = 'none';
+  const ps = document.getElementById('paySuccess');
+  const ref = 'NP-PAY-' + new Date().getFullYear() + '-' + (lobenr || '048291').split('-').pop();
+  document.getElementById('payRef').textContent = 'Ref: ' + ref;
+  ps.style.display = 'block';
+  ps.classList.add('visible');
+}
+
+// Enter key on search
+document.getElementById('lobenrInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') searchAfgift();
+});
+
+// ─── Klage submit
+function submitKlage() {
+  const lobenr = document.getElementById('klageLobenr').value.trim();
+  if (!lobenr) {
+    document.getElementById('klageLobenr').style.borderColor = 'rgba(239,68,68,0.5)';
+    document.getElementById('klageLobenr').focus();
+    return;
+  }
+  document.getElementById('klageFormWrap').style.display = 'none';
+  const success = document.getElementById('klageSuccess');
+  const sagsnr = 'KL-' + new Date().getFullYear() + '-' + Math.floor(Math.random() * 90000 + 10000);
+  document.getElementById('klageRef').textContent = 'Sagsnr: ' + sagsnr;
+  success.classList.add('visible');
+}
+
+// ─── File upload display
+function handleFiles(input) {
+  const list = document.getElementById('fileList');
+  const names = Array.from(input.files).map(f => '📄 ' + f.name).join('  ·  ');
+  list.textContent = names;
+}
+</script>
+</body>
+</html>
